@@ -39,6 +39,7 @@ dependencies:
   crypton: ^2.2.1
   pointycastle: ^3.9.1
   crypto: ^3.0.5
+  mailer: ^6.1.2
 
 dev_dependencies:
   flutter_test:
