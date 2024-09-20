@@ -1,9 +1,6 @@
-import 'package:app/Views/affine_cipher.dart';
-import 'package:app/Views/animations/glitch.dart';
-import 'package:app/Views/caeser_cipher.dart';
-import 'package:app/Views/playfair_cipher.dart';
-import 'package:app/Views/text_input_screen.dart';
-import 'package:app/utils/colors.dart'; // Assuming this imports the CyberpunkColors class
+import 'package:app/Views/encryption_page.dart';
+import 'package:app/Views/profile_page.dart';
+import 'package:app/utils/colors.dart';
 import 'package:flutter/material.dart';
 
 class MainPage extends StatefulWidget {
@@ -12,102 +9,48 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  List<Widget> screens = const [
+      EncrytionPage(),ProfilePage()
+    ];
+    int selected_index = 0;
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: CyberpunkColors.oxfordBlue, // Use Oxford Blue as background
-      body: Container(
-        height: screenHeight,
+      backgroundColor: CyberpunkColors.oxfordBlue,
+      body:screens[selected_index],
+      bottomNavigationBar: Container(
+        height: 70,
         width: screenWidth,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
+        // margin: EdgeInsets.only(bottom: 20),
+
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.only(topLeft: Radius.circular(25),topRight: Radius.circular(25)),
+                  color: CyberpunkColors.darkViolet,
+        //   gradient: LinearGradient(
+        //     colors: [
+        //       CyberpunkColors.zaffre,
+        //       CyberpunkColors.oxfordBlue
+        //     ],
+        //     begin: Alignment.topCenter,
+        //     end: Alignment.bottomCenter
+        //   ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            const GlitchText(
-              text: 'ENCRYPTO',
-              style: TextStyle(
-                fontSize: 50,
-                fontWeight: FontWeight.bold,
-                color: Colors.white, // Keeping white color for text
-              ),
-            ),
-            SizedBox(
-                width: screenWidth / 2.5,
-                child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const TextInputScreen(
-                                    pageName: "RSA",
-                                    labelText: "Enter Message",
-                          )));
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: CyberpunkColors.hollywoodCerise, // Hollywood Cerise for buttons
-                    ),
-                    child: const Text(
-                      "RSA",
-                      style: TextStyle(
-                        color: CyberpunkColors.fluorescentCyan, // Fluorescent Cyan for button text
-                      ),
-                    ))),
-            const SizedBox(
-              height: 30,
-            ),
-            SizedBox(
-                width: screenWidth / 2.5,
-                child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=>const CaesarCipherScreen()));
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: CyberpunkColors.hollywoodCerise,
-                    ),
-                    child: const Text(
-                      "Caeser Cipher",
-                      style: TextStyle(color: CyberpunkColors.fluorescentCyan),
-                    ))),
-            const SizedBox(
-              height: 30,
-            ),
-            SizedBox(
-                width: screenWidth / 2.5,
-                child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const AffineCipherScreen()));
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: CyberpunkColors.hollywoodCerise,
-                    ),
-                    child: const Text(
-                      "Affine Cipher",
-                      style: TextStyle(color: CyberpunkColors.fluorescentCyan),
-                    ))),
-            const SizedBox(
-              height: 30,
-            ),
-            SizedBox(
-                width: screenWidth / 2.5,
-                child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const PlayfairCipherScreen()));
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: CyberpunkColors.hollywoodCerise,
-                    ),
-                    child: const Text(
-                      "Playfair Cipher",
-                      style: TextStyle(color: CyberpunkColors.fluorescentCyan),
-                    ))),
+            IconButton(onPressed: (){
+              setState(() {
+                selected_index = 0;
+              });
+            }, icon: const Icon(Icons.select_all_rounded,size: 40,color: Colors.white,)),
+                        IconButton(onPressed: (){
+setState(() {
+                            selected_index = 1;
+});
+                        }, icon: const Icon(Icons.person,size: 40,color: Colors.white,))
+
           ],
         ),
       ),
