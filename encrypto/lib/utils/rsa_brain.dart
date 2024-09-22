@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'dart:typed_data';
 import 'package:pointycastle/export.dart';
 import 'package:crypto/crypto.dart'; // For hashing
@@ -20,14 +21,15 @@ class RSAUtils {
     );
   }
 
-  static SecureRandom getSecureRandom() {
-    final secureRandom = FortunaRandom();
-    // Create a secure random seed
-    final seedSource = Uint8List(32);
-    final seed = sha256.convert(seedSource).bytes;  // Corrected: Use sha256 hashing
-    secureRandom.seed(KeyParameter(Uint8List.fromList(seed)));
-    return secureRandom;
-  }
+static SecureRandom getSecureRandom() {
+  final secureRandom = FortunaRandom();
+  final random = Random.secure();
+  final seedSource = List<int>.generate(32, (_) => random.nextInt(256));
+  final seed = sha256.convert(Uint8List.fromList(seedSource)).bytes;
+  secureRandom.seed(KeyParameter(Uint8List.fromList(seed)));
+  return secureRandom;
+}
+
 
   static Uint8List rsaEncrypt(String plaintext, RSAPublicKey publicKey) {
     final encryptor = RSAEngine()

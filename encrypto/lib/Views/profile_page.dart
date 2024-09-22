@@ -1,4 +1,5 @@
 import 'package:app/Views/sign-in-up/sign_in.dart';
+import 'package:app/services/emailService.dart';
 import 'package:app/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:mailer/mailer.dart';
@@ -7,31 +8,7 @@ import 'package:mailer/smtp_server.dart';
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
-  Future sendEmail() async {
-    final username = 'Enter Email';
-    final password = 'Less secure pass';
-
-    // Define SMTP server
-    final smtpServer = gmail(username, password);
-
-    // Create message
-    // Create the message
-    final message = Message()
-      ..from = Address(username, 'Your Name')
-      ..recipients.add('imbetter27h@gmail.com') // Correct recipient email
-      ..subject = 'Test Email from Flutter App'
-      ..text = 'This is a test email sent from Flutter!';
-
-    try {
-      // sending email
-      final sendReport = await send(message, smtpServer);
-          print('Message sent: ' + sendReport.toString());
-
-    } on MailerException catch (e) {
-      print("\n Message not sent");
-    }
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -128,12 +105,7 @@ class ProfilePage extends StatelessWidget {
             const SizedBox(
               height: 20,
             ),
-            ElevatedButton(
-              onPressed: () {
-                sendEmail();
-              },
-              child: const Text('Send Email'),
-            )
+
           ],
         ),
       ),

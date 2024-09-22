@@ -108,33 +108,39 @@ class _TextInputScreenState extends State<TextInputScreen> {
     return Scaffold(
       backgroundColor: CyberpunkColors.oxfordBlue, // Set background color to Cyberpunk theme
       appBar: AppBar(
-        title: Text(
-          widget.pageName,
-          style:const  TextStyle(color: CyberpunkColors.fluorescentCyan),
+  title: Text(
+    widget.pageName,
+    style: const TextStyle(color: CyberpunkColors.fluorescentCyan),
+  ),
+  backgroundColor: CyberpunkColors.darkViolet, // Cyberpunk theme for AppBar
+  centerTitle: true,
+  leading: IconButton(
+    onPressed: () {
+      Navigator.pop(context);
+    },
+    icon: const Icon(
+      Icons.arrow_back_ios_new_rounded,
+      color: CyberpunkColors.fluorescentCyan, // Icon color from Cyberpunk theme
+    ),
+  ),
+  actions: [
+    Tooltip(
+      message: 'Implements the RSA algorithm to encrypt text using public and private keys.', // The message to display when hovering or long-pressing
+      preferBelow: true,
+      waitDuration: const Duration(milliseconds: 1000),
+      child: IconButton(
+        onPressed: () {
+          // You can add any action here if needed
+        },
+        icon: const Icon(
+          Icons.info,
+          color: CyberpunkColors.fluorescentCyan, // Icon color
         ),
-        backgroundColor: CyberpunkColors.darkViolet, // Cyberpunk theme for AppBar
-        centerTitle: true,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: CyberpunkColors.fluorescentCyan, // Icon color from Cyberpunk theme
-          ),
-        ),
-        actions: [
-            IconButton(
-              onPressed: () {
-                
-              },
-              icon: const Icon(
-                Icons.arrow_forward_ios_rounded,
-                color: CyberpunkColors.fluorescentCyan, // Icon color
-              ),
-            ),
-        ],
       ),
+    ),
+  ],
+),
+
       body: Column(
         children: [
           TextInputField(publicKeyController: _textController, labelText: 'Enter Message'),

@@ -1,4 +1,5 @@
 import 'package:app/components/text_input_field.dart';
+import 'package:app/services/emailService.dart';
 import 'package:app/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,6 +15,7 @@ class PlayfairCipherScreen extends StatefulWidget {
 class _PlayfairCipherScreenState extends State<PlayfairCipherScreen> {
   final textController = TextEditingController();
   String resultText = '';
+  String recipientEmail = '';
 
   void encryptText() {
     final text = textController.text.toUpperCase();
@@ -166,7 +168,65 @@ String playfairDecrypt(String text, String key) {
     textController.dispose();
     super.dispose();
   }
-
+void showEmailBottomSheet() {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: CyberpunkColors.darkViolet,
+    isScrollControlled: true, // Allows the bottom sheet to adjust height when the keyboard appears
+    builder: (BuildContext context) {
+      return Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom, // Adjust padding based on keyboard
+        ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Enter Receiver\'s Email',
+                  style: TextStyle(fontSize: 18, color: CyberpunkColors.fluorescentCyan),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  cursorColor: CyberpunkColors.fluorescentCyan,
+                  decoration: const InputDecoration(
+                    labelText: 'Receiver Email',
+                    labelStyle: TextStyle(color: Colors.white),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: CyberpunkColors.fluorescentCyan),
+                    ),
+                  ),
+                  style: const TextStyle(color: CyberpunkColors.fluorescentCyan),
+                  onChanged: (value) {
+                    recipientEmail = value;
+                  },
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    FocusScope.of(context).unfocus(); // Remove focus to prevent keyboard from showing
+                    Navigator.pop(context); // Close the bottom sheet
+                    EmailService().sendPFEmail(recipientEmail, resultText, "Playfair Cipher"); // Call email sending function
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: CyberpunkColors.hollywoodCerise,
+                  ),
+                  child: const Text(
+                    'Send Email',
+                    style: TextStyle(color: CyberpunkColors.fluorescentCyan),
+                  ),
+                ),
+                
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -187,6 +247,21 @@ String playfairDecrypt(String text, String key) {
             color: CyberpunkColors.fluorescentCyan, // Icon color from Cyberpunk theme
           ),
         ),
+        actions: [
+    Tooltip(
+      message: 'Utilizes a 5x5 matrix of letters to encrypt pairs of letters in the plaintext.',      preferBelow: true,
+      waitDuration: const Duration(milliseconds: 1000),
+      child: IconButton(
+        onPressed: () {
+          // You can add any action here if needed
+        },
+        icon: const Icon(
+          Icons.info,
+          color: CyberpunkColors.fluorescentCyan, // Icon color
+        ),
+      ),
+    ),
+  ],
       ),
       body: SafeArea(
         child: Center(
@@ -247,6 +322,16 @@ String playfairDecrypt(String text, String key) {
                     ),
                   ],
                 ),
+                ElevatedButton(
+                    onPressed: showEmailBottomSheet,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: CyberpunkColors.hollywoodCerise,
+                    ),
+                    child: const Text(
+                      'Share via Email',
+                      style: TextStyle(color: CyberpunkColors.fluorescentCyan),
+                    ),
+                  ),
               ],
             ),
           ),

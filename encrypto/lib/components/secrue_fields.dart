@@ -4,26 +4,35 @@ import 'package:flutter/material.dart';
 class SecureField extends StatelessWidget {
   const SecureField({
     super.key,
-    required TextEditingController publicKeyController, required this.labelText, required this.prefixIcon, required this.isPassword,
-  }) : _publicKeyController = publicKeyController;
+    required this.publicKeyController, 
+    required this.labelText, 
+    required this.prefixIcon, 
+    required this.isPassword,
+    this.validator, // Add the validator field
+  });
 
   final String labelText;
-  final TextEditingController _publicKeyController;
+  final TextEditingController publicKeyController;
   final IconData prefixIcon;
   final bool isPassword;
+  final String? Function(String?)? validator; // Validator for input
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(15),
-      child: TextField(
+      child: TextFormField( // Changed from TextField to TextFormField for validation
         cursorColor: CyberpunkColors.fluorescentCyan,
         style: const TextStyle(color: CyberpunkColors.fluorescentCyan),
         obscureText: isPassword,
         obscuringCharacter: '*',
-        controller: _publicKeyController,
+        controller: publicKeyController,
+        validator: validator, // Use validator if provided
         decoration: InputDecoration(
-          prefixIcon: Icon(prefixIcon,color: CyberpunkColors.fluorescentCyan,),
+          prefixIcon: Icon(
+            prefixIcon,
+            color: CyberpunkColors.fluorescentCyan,
+          ),
           labelText: labelText,
           labelStyle: const TextStyle(color: CyberpunkColors.fluorescentCyan),
           border: OutlineInputBorder(

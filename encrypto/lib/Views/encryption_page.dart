@@ -3,6 +3,7 @@ import 'package:app/Views/animations/glitch.dart';
 import 'package:app/Views/caeser_cipher.dart';
 import 'package:app/Views/playfair_cipher.dart';
 import 'package:app/Views/text_input_screen.dart';
+import 'package:app/rsa/pages/home_page.dart';
 import 'package:app/utils/colors.dart';
 import 'package:flutter/material.dart';
 
@@ -22,6 +23,11 @@ class EncrytionPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            //        Image.asset(
+            //   'assets/hero.gif',
+            //   height: screenHeight / 3,  // Adjust size as needed
+            //   fit: BoxFit.contain,       // Ensure it fits within its constraints
+            // ),
             const GlitchText(
               text: 'ENCRYPTO',
               style: TextStyle(
@@ -37,10 +43,7 @@ class EncrytionPage extends StatelessWidget {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const TextInputScreen(
-                                    pageName: "RSA",
-                                    labelText: "Enter Message",
-                          )));
+                              builder: (context) => const HomePageRsa()));
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: CyberpunkColors.hollywoodCerise, // Hollywood Cerise for buttons
