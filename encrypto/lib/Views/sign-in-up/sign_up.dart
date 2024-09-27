@@ -23,22 +23,24 @@ class _SignUpState extends State<SignUp> {
   final TextEditingController _passwordController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;  // Loading state for showing the loader
 
   String? _sanitizeInput(String input) {
     return input.trim(); // Trims leading and trailing whitespace
   }
 
   bool _isPasswordStrong(String password) {
-    // Password validation: at least 8 characters, contains uppercase, lowercase, number, and special character
-    final RegExp passwordRegex = RegExp(
-      r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#\$&*~])[A-Za-z\d!@#\$&*~]{8,}$',
-    );
-    return passwordRegex.hasMatch(password);
-  }
+  // Password validation: at least 8 characters, contains letters and numbers
+  final RegExp passwordRegex = RegExp(
+    r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$',
+  );
+  return passwordRegex.hasMatch(password);
+}
+
 
   Future<int> signUp(String username, String email, String password) async {
     try {
-      Uri url = Uri.parse('${Api.domain}/signup');
+      Uri url = Uri.parse('${Api.domain}/auth/signup');
       print(url);
       final response = await http.post(url,
           headers: {
@@ -154,46 +156,64 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
                 SizedBox(
-                  width: screenWidth / 2.5,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if (_formKey.currentState!.validate()) {
-                        // Perform sign-up action after all validations pass
-                        String username =
-                            _sanitizeInput(_usernameController.text)!;
-                        String email = _sanitizeInput(_emailController.text)!;
-                        String password =
-                            _sanitizeInput(_passwordController.text)!;
-                        int code = await signUp(username, email, password);
-                        print(
-                            "Signing up with username: $username, email: $email");
-                        print("Response code: $code");
+  width: screenWidth / 2.5,
+  child: ElevatedButton(
+    onPressed: _isLoading
+        ? null
+        : () async {
+            if (_formKey.currentState!.validate()) {
+              setState(() {
+                _isLoading = true; // Show loader
+              });
+              String username =
+                  _sanitizeInput(_usernameController.text)!;
+              String email = _sanitizeInput(_emailController.text)!;
+              String password =
+                  _sanitizeInput(_passwordController.text)!;
+              int code = await signUp(username, email, password);
+              print(
+                  "Signing up with username: $username, email: $email");
+              print("Response code: $code");
 
-                        if (code == 201) {
-                          // ignore: use_build_context_synchronously
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => MainPage()));
-                        }
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: CyberpunkColors.hollywoodCerise,
-                      elevation: 8, // Shadow effect
-                    ),
-                    child: const Text(
-                      "Sign Up",
-                      style: TextStyle(
-                        color: CyberpunkColors.fluorescentCyan,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ),
-                ),
+              setState(() {
+                _isLoading = false; // Hide loader after process
+              });
+
+              if (code == 201) {
+                // ignore: use_build_context_synchronously
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => MainPage()));
+              }
+            }
+          },
+    style: ElevatedButton.styleFrom(
+      backgroundColor: CyberpunkColors.hollywoodCerise,
+      elevation: 8, // Shadow effect
+    ),
+    child: _isLoading
+        ? const SizedBox(
+            height: 24,
+            width: 24,
+            child: CircularProgressIndicator(
+              strokeWidth: 2.5, // Thinner loader stroke
+              color: Colors.white,
+            ),
+          )
+        : const Text(
+            "Sign Up",
+            style: TextStyle(
+              color: CyberpunkColors.fluorescentCyan,
+              fontSize: 18,
+            ),
+          ),
+  ),
+),
+
                 const SizedBox(height: 5),
                 TextButton(
-                  onPressed: () {
+                  onPressed: _isLoading ? null : () {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(

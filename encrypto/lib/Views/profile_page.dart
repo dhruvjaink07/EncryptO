@@ -1,18 +1,39 @@
 import 'package:app/Views/sign-in-up/sign_in.dart';
-import 'package:app/services/emailService.dart';
 import 'package:app/utils/colors.dart';
 import 'package:flutter/material.dart';
-import 'package:mailer/mailer.dart';
-import 'package:mailer/smtp_server.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
-  
+  @override
+  _ProfilePageState createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  String _username = '';
+  String _email = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileData();
+  }
+
+  // Load username and email from SharedPreferences
+  Future<void> _loadProfileData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _username = prefs.getString('username') ?? 'Unknown';
+      _email = prefs.getString('email') ?? 'Unknown';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: CyberpunkColors.oxfordBlue,
       appBar: AppBar(
@@ -40,32 +61,29 @@ class ProfilePage extends StatelessWidget {
               height: 100,
               width: 200,
               decoration: const BoxDecoration(
-                  color: CyberpunkColors.fluorescentCyan,
-                  shape: BoxShape.circle),
+                color: CyberpunkColors.fluorescentCyan,
+                shape: BoxShape.circle,
+              ),
             ),
-            const SizedBox(
-              height: 3,
-            ),
-            const Text(
-              'Dhruv Jain',
-              style: TextStyle(
+            const SizedBox(height: 10),
+            // Display the retrieved username
+            Text(
+              _username,
+              style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,
                   fontWeight: FontWeight.w900),
             ),
-            const SizedBox(
-              height: 5,
-            ),
-            const Text(
-              "dhruvjainz",
-              style: TextStyle(
+            const SizedBox(height: 5),
+            // Display the retrieved email
+            Text(
+              _email,
+              style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.w600),
             ),
-            const SizedBox(
-              height: 20,
-            ),
+            const SizedBox(height: 20),
             const Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -76,7 +94,7 @@ class ProfilePage extends StatelessWidget {
                             color: Colors.white,
                             fontSize: 18,
                             fontWeight: FontWeight.w600)),
-                    Text('Connextions',
+                    Text('Connections',
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,
@@ -102,10 +120,7 @@ class ProfilePage extends StatelessWidget {
                 )
               ],
             ),
-            const SizedBox(
-              height: 20,
-            ),
-
+            const SizedBox(height: 20),
           ],
         ),
       ),
