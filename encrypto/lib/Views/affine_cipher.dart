@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:app/components/text_input_field.dart';
 import 'package:app/services/emailService.dart';
 import 'package:app/utils/colors.dart';
+import 'package:app/utils/constants.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -87,6 +91,63 @@ class _AffineCipherScreenState extends State<AffineCipherScreen> {
     return plainText;
   }
 
+Future<void> pickAndEncryptFile() async {
+  FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['txt']);
+  if (result != null) {
+    File file = File(result.files.single.path!);
+    String content = await file.readAsString();
+    int key = int.tryParse(keyOneController.text) ?? 5;
+    int key2 = int.tryParse(keyTwoController.text) ?? 7;
+    String encryptedText = affineEncrypt(content, key, key2);
+
+    // Get the Downloads directory path
+    Directory? downloadsDirectory = Directory(Api.directoryPath);
+
+    // Save encrypted file in the Downloads directory 
+    if (downloadsDirectory.existsSync()) {
+      String newPath = '${downloadsDirectory.path}/affine_encrypted_demo.txt';
+      File encryptedFile = File(newPath);
+      await encryptedFile.writeAsString(encryptedText);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('File encrypted and saved at $newPath')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to access Downloads directory')),
+      );
+    }
+  }
+}
+
+Future<void> pickAndDecryptFile() async {
+  FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['txt']);
+  if (result != null) {
+    File file = File(result.files.single.path!);
+    String content = await file.readAsString();
+    int key = int.tryParse(keyOneController.text) ?? 5;
+    int key2 = int.tryParse(keyTwoController.text) ?? 7;
+    String decryptedText = affineDecrypt(content, key, key2);
+
+    // Get the Downloads directory path
+    Directory? downloadsDirectory = Directory(Api.directoryPath);
+
+    // Save decrypted file in the Downloads directory
+    if (downloadsDirectory.existsSync()) {
+      String newPath = '${downloadsDirectory.path}/affine_decrypted_demo.txt';
+      File decryptedFile = File(newPath);
+      await decryptedFile.writeAsString(decryptedText);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('File decrypted and saved at $newPath')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to access Downloads directory')),
+      );
+    }
+  }
+}
   void copyResult() {
     Clipboard.setData(ClipboardData(text: resultText));
     ScaffoldMessenger.of(context).showSnackBar(
@@ -271,6 +332,15 @@ void showEmailBottomSheet() {
                       'Share via Email',
                       style: TextStyle(color: CyberpunkColors.fluorescentCyan),
                     ),
+                  ),
+                  ElevatedButton(
+                    onPressed: pickAndEncryptFile,
+                    child: const Text('Encrypt Text File'),
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: pickAndDecryptFile,
+                    child: const Text('Decrypt Text File'),
                   ),
                 ],
               ),

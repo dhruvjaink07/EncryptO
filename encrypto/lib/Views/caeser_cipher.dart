@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:app/utils/colors.dart'; // Assuming you have your custom Cyberpunk colors
 import 'dart:io';
-
+import 'package:app/utils/constants.dart';
 class CaesarCipherScreen extends StatefulWidget {
   const CaesarCipherScreen({super.key});
 
@@ -139,33 +139,62 @@ class _CaesarCipherScreenState extends State<CaesarCipherScreen> {
     );
   }
 
-  Future<void> pickAndEncryptFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['txt']);
-    if (result != null) {
-      File file = File(result.files.single.path!);
-      String content = await file.readAsString();
-      int shift = int.tryParse(shiftController.text) ?? 0;
-      String encryptedText = caesarCipher(content, shift);
-      file.writeAsString(encryptedText); // Overwrite file with encrypted content
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('File encrypted successfully!')),
-      );
-    }
-  }
 
-  Future<void> pickAndDecryptFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['txt']);
-    if (result != null) {
-      File file = File(result.files.single.path!);
-      String content = await file.readAsString();
-      int shift = int.tryParse(shiftController.text) ?? 0;
-      String decryptedText = decryptCaesarCipher(content, shift);
-      file.writeAsString(decryptedText); // Overwrite file with decrypted content
+Future<void> pickAndEncryptFile() async {
+  FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['txt']);
+  if (result != null) {
+    File file = File(result.files.single.path!);
+    String content = await file.readAsString();
+    int shift = int.tryParse(shiftController.text) ?? 0;
+    String encryptedText = caesarCipher(content, shift);
+
+    // Get the Downloads directory path
+    Directory? downloadsDirectory = Directory(Api.directoryPath);
+
+    // Save encrypted file in the Downloads directory 
+    if (downloadsDirectory.existsSync()) {
+      String newPath = '${downloadsDirectory.path}/encrypted_demo.txt';
+      File encryptedFile = File(newPath);
+      await encryptedFile.writeAsString(encryptedText);
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('File decrypted successfully!')),
+        SnackBar(content: Text('File encrypted and saved at $newPath')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to access Downloads directory')),
       );
     }
   }
+}
+
+Future<void> pickAndDecryptFile() async {
+  FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['txt']);
+  if (result != null) {
+    File file = File(result.files.single.path!);
+    String content = await file.readAsString();
+    int shift = int.tryParse(shiftController.text) ?? 0;
+    String decryptedText = decryptCaesarCipher(content, shift);
+
+    // Get the Downloads directory path
+    Directory? downloadsDirectory = Directory(Api.directoryPath);
+
+    // Save decrypted file in the Downloads directory
+    if (downloadsDirectory.existsSync()) {
+      String newPath = '${downloadsDirectory.path}/decrypted_demo.txt';
+      File decryptedFile = File(newPath);
+      await decryptedFile.writeAsString(decryptedText);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('File decrypted and saved at $newPath')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to access Downloads directory')),
+      );
+    }
+  }
+}
 
   String decryptCaesarCipher(String text, int shift) {
     String plainText = '';

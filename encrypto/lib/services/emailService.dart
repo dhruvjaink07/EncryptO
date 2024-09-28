@@ -104,7 +104,7 @@ class EmailService {
   }
 
 // PLayfair cipher
-Future<void> sendPFEmail(String recipientEmail, String encryptedMessage, String algorithmName) async {
+Future<void> sendPFEmail(String recipientEmail, String encryptedMessage, String algorithmName,String key) async {
     final smtpServer = gmail(username, password);
     print("Sending email to $recipientEmail");
 
@@ -121,8 +121,7 @@ Future<void> sendPFEmail(String recipientEmail, String encryptedMessage, String 
             <h2 style="color: #333333; text-align: center;">🔒 Encrypted Message from EncryptO</h2>
             
             <p style="color: #555555;">Hello,</p>
-            <p style="color: #555555;">You have received an encrypted message using the <b>$algorithmName</b> algorithm.</p>
-            
+            <p style="color: #555555;">You have received an encrypted message using the <b>$algorithmName</b> algorithm. Key is "${key}"</p>
             <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; border: 1px solid #dddddd; word-wrap: break-word;">
               <code style="color: #d6336c; font-size: 16px;">
                 $encryptedMessage

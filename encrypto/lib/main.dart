@@ -1,5 +1,7 @@
+import 'package:app/Views/aes_file_hashing.dart';
 import 'package:app/Views/encryption_page.dart';
 import 'package:app/Views/main_page.dart';
+import 'package:app/Views/md5_hash_screen.dart';
 import 'package:app/Views/sign-in-up/sign_up.dart';
 import 'package:flutter/material.dart';
 void main() {
@@ -18,7 +20,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: SignUp()
+      home: MainPage()
       );
   }
 }
