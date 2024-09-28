@@ -124,16 +124,16 @@ class _DecryptInputPageState extends State<DecryptInputPage> {
         height: 1000,
         child: Column(
           children: [
+            EditorScreenTemplate(
+              controller: secretMessageController,
+            ),
             ElevatedButton.icon(
               onPressed: pickEncryptedFile,
-              icon: const Icon(Icons.attach_file),
-              label: const Text('Choose Encrypted .txt File'),
+              icon: const Icon(Icons.attach_file, color: Colors.white),
+              label: const Text('Choose Encrypted .txt File', style: TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: CyberpunkColors.hollywoodCerise,
               ),
-            ),
-            EditorScreenTemplate(
-              controller: secretMessageController,
             ),
           ],
         ),

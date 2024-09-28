@@ -7,6 +7,9 @@ import 'package:app/utils/constants.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:whatsapp_unilink/whatsapp_unilink.dart';
 
 class PlayfairCipherScreen extends StatefulWidget {
   const PlayfairCipherScreen({super.key});
@@ -18,6 +21,7 @@ class PlayfairCipherScreen extends StatefulWidget {
 class _PlayfairCipherScreenState extends State<PlayfairCipherScreen> {
   final textController = TextEditingController();
   final keyController = TextEditingController();
+  final phoneController = TextEditingController();
   String resultText = '';
   String recipientEmail = '';
 
@@ -254,10 +258,84 @@ class _PlayfairCipherScreenState extends State<PlayfairCipherScreen> {
       },
     );
   }
+// Add these methods to your _CaesarCipherScreenState class
 
+  launchWhatsAppUri(String phoneNumber) async {
+    final link = WhatsAppUnilink(
+      phoneNumber: phoneNumber,
+      text: "Message $resultText : To Decrypt : Key is - ${keyController.text} as of Playfair Cipher",
+    );
+    // Correctly convert to Uri using toString()
+    final uri = Uri.parse(link.toString());
+
+    try {
+      await launchUrl(uri);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to launch WhatsApp')),
+      );
+    }
+  }
+
+  void showPhoneNumberDialog() {
+    String phoneNumber = '';
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: CyberpunkColors.oxfordBlue,
+          title: const Text(
+            'Enter Phone Number',
+            style: TextStyle(color: CyberpunkColors.fluorescentCyan),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16.0, vertical: 8.0), // Reduced padding
+
+          content: TextInputField(
+              publicKeyController: phoneController,
+              labelText: 'Phone Number (with country code)'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: CyberpunkColors.darkViolet),
+              ),
+              onPressed: () {
+                phoneController.clear();
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text(
+                'Send',
+                style: TextStyle(color: CyberpunkColors.darkViolet),
+              ),
+              onPressed: () {
+                if (phoneController.text.isNotEmpty) {
+                  Navigator.of(context).pop(); // Close the dialog
+                  phoneNumber = phoneController.text;
+                  launchWhatsAppUri(
+                      phoneNumber); // Launch WhatsApp with the entered phone number
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Please enter a valid phone number')),
+                  );
+                }
+                phoneController.clear();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
+      backgroundColor: CyberpunkColors.oxfordBlue,
       appBar: AppBar(
         backgroundColor: CyberpunkColors.darkViolet,
         title: const Text('Playfair Cipher', style: TextStyle(color: CyberpunkColors.fluorescentCyan)),
@@ -267,6 +345,7 @@ class _PlayfairCipherScreenState extends State<PlayfairCipherScreen> {
               setState(() {
                 textController.clear();
                 keyController.clear();
+                phoneController.clear();
                 resultText = '';
               });
             },
@@ -277,96 +356,115 @@ class _PlayfairCipherScreenState extends State<PlayfairCipherScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const Text(
-              'Playfair Cipher Encryption & Decryption',
-              style: TextStyle(fontSize: 24, color: CyberpunkColors.fluorescentCyan),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20),
-            TextInputField(
-              publicKeyController: textController,
-              labelText: 'Enter Text',
-            ),
-            const SizedBox(height: 10),
-            TextInputField(
-              publicKeyController: keyController,
-              labelText: 'Enter Key',
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => encryptText(keyController.text),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: CyberpunkColors.hollywoodCerise,
+      body: Container(
+        alignment: Alignment.center,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text(
+                'Playfair Cipher',
+                style: TextStyle(fontSize: 24, color: CyberpunkColors.fluorescentCyan),
+                textAlign: TextAlign.center,
               ),
-              child: const Text(
-                'Encrypt',
-                style: TextStyle(color: CyberpunkColors.fluorescentCyan),
+              const SizedBox(height: 20),
+              TextInputField(
+                publicKeyController: textController,
+                labelText: 'Enter Text',
               ),
-            ),
-            ElevatedButton(
-              onPressed: () => decryptText(keyController.text),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: CyberpunkColors.hollywoodCerise,
+              const SizedBox(height: 10),
+              TextInputField(
+                publicKeyController: keyController,
+                labelText: 'Enter Key',
               ),
-              child: const Text(
-                'Decrypt',
-                style: TextStyle(color: CyberpunkColors.fluorescentCyan),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  const SizedBox(width: 16.0),
+                       SizedBox(
+                width: screenWidth / 2.5,
+                child: ElevatedButton(
+                  onPressed:(){
+                    encryptText(keyController.text);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: CyberpunkColors.hollywoodCerise, // Button color
+                  ),
+                  child: const Text(
+                    "Encrypt",
+                    style: TextStyle(
+                      color: CyberpunkColors.fluorescentCyan,
+                      fontSize: 18,
+                    ),
+                  ),
+                ),),
+                    const SizedBox(width: 16.0),
+                       SizedBox(
+                width: screenWidth / 2.5,
+                child: ElevatedButton(
+                  onPressed:(){
+                    decryptText(keyController.text);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: CyberpunkColors.hollywoodCerise, // Button color
+                  ),
+                  child: const Text(
+                    "Decrypt",
+                    style: TextStyle(
+                      color: CyberpunkColors.fluorescentCyan,
+                      fontSize: 18,
+                    ),
+                  ),
+                ),)
+        
+                ],
               ),
-            ),
-            const SizedBox(height: 20),
-            SelectableText(
-              'Result: $resultText',
-              style: const TextStyle(color: CyberpunkColors.fluorescentCyan),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: copyResult,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: CyberpunkColors.hollywoodCerise,
+              
+              const SizedBox(height: 16.0),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text('Result: $resultText',style:const TextStyle(color: CyberpunkColors.fluorescentCyan)),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.copy),
+                          onPressed: copyResult,color: CyberpunkColors.fluorescentCyan,
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                      const Text('Share on: ',style: TextStyle(color: Colors.white),),
+                      IconButton(
+                          icon: const Icon(Icons.mail_outline_outlined, color: CyberpunkColors.fluorescentCyan,),
+                          onPressed: showEmailBottomSheet),
+                      IconButton(onPressed: showPhoneNumberDialog, icon: const FaIcon(FontAwesomeIcons.whatsapp, color: CyberpunkColors.fluorescentCyan,))
+                    ]),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: pickAndEncryptFile,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: CyberpunkColors.hollywoodCerise,
+                ),
+                child: const Text(
+                  'Encrypt File',
+                  style: TextStyle(color: CyberpunkColors.fluorescentCyan),
+                ),
               ),
-              child: const Text(
-                'Copy Result',
-                style: TextStyle(color: CyberpunkColors.fluorescentCyan),
+              ElevatedButton(
+                onPressed: pickAndDecryptFile,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: CyberpunkColors.hollywoodCerise,
+                ),
+                child: const Text(
+                  'Decrypt File',
+                  style: TextStyle(color: CyberpunkColors.fluorescentCyan),
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: pickAndEncryptFile,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: CyberpunkColors.hollywoodCerise,
-              ),
-              child: const Text(
-                'Encrypt File',
-                style: TextStyle(color: CyberpunkColors.fluorescentCyan),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: pickAndDecryptFile,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: CyberpunkColors.hollywoodCerise,
-              ),
-              child: const Text(
-                'Decrypt File',
-                style: TextStyle(color: CyberpunkColors.fluorescentCyan),
-              ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: showEmailBottomSheet,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: CyberpunkColors.hollywoodCerise,
-              ),
-              child: const Text(
-                'Email Result',
-                style: TextStyle(color: CyberpunkColors.fluorescentCyan),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

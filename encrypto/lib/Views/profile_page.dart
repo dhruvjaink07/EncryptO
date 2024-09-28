@@ -54,7 +54,7 @@ class _ProfilePageState extends State<ProfilePage> {
         height: screenHeight,
         width: screenWidth,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
@@ -83,44 +83,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   fontSize: 18,
                   fontWeight: FontWeight.w600),
             ),
-            const SizedBox(height: 20),
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Column(
-                  children: [
-                    Text('500',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600)),
-                    Text('Connections',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600))
-                  ],
-                ),
-                SizedBox(
-                  width: 30,
-                ),
-                Column(
-                  children: [
-                    Text('2019',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600)),
-                    Text("Joined",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600))
-                  ],
-                )
-              ],
-            ),
-            const SizedBox(height: 20),
+            
           ],
         ),
       ),

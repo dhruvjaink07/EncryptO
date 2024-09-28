@@ -144,8 +144,8 @@ class _MessageInputPageState extends State<MessageInputPage> {
             // Button to pick a file
             ElevatedButton.icon(
               onPressed: pickFile,
-              icon: const Icon(Icons.attach_file),
-              label: const Text('Choose .txt File'),
+              icon: const Icon(Icons.attach_file,color:Colors.white),
+              label: const Text('Choose .txt File',style: TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: CyberpunkColors.hollywoodCerise,
               ),

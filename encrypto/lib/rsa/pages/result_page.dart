@@ -1,9 +1,14 @@
+import 'package:app/components/text_input_field.dart';
 import 'package:app/rsa/utilities/constants.dart';
 import 'package:app/rsa/widgets/appbar_icon_button.dart';
 import 'package:app/rsa/widgets/copy_icon_button.dart';
 import 'package:app/rsa/widgets/message_bubble.dart';
+import 'package:app/services/emailService.dart';
 import 'package:app/utils/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:whatsapp_unilink/whatsapp_unilink.dart';
 
 late String _message;
 late String _title;
@@ -22,6 +27,80 @@ class ResultPage extends StatefulWidget {
 }
 
 class _ResultPageState extends State<ResultPage> {
+ final phoneController = TextEditingController();
+// Add these methods to your _CaesarCipherScreenState class
+
+  launchWhatsAppUri(String phoneNumber) async {
+    final link = WhatsAppUnilink(
+      phoneNumber: phoneNumber,
+      text: "Message ${_message}",
+    );
+    // Correctly convert to Uri using toString()
+    final uri = Uri.parse(link.toString());
+
+    try {
+      await launchUrl(uri);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to launch WhatsApp')),
+      );
+    }
+  }
+
+  void showPhoneNumberDialog() {
+    String phoneNumber = '';
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: CyberpunkColors.oxfordBlue,
+          title: const Text(
+            'Enter Phone Number',
+            style: TextStyle(color: CyberpunkColors.fluorescentCyan),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16.0, vertical: 8.0), // Reduced padding
+
+          content: TextInputField(
+              publicKeyController: phoneController,
+              labelText: 'Phone Number (with country code)'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: CyberpunkColors.darkViolet),
+              ),
+              onPressed: () {
+                phoneController.clear();
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text(
+                'Send',
+                style: TextStyle(color: CyberpunkColors.darkViolet),
+              ),
+              onPressed: () {
+                if (phoneController.text.isNotEmpty) {
+                  Navigator.of(context).pop(); // Close the dialog
+                  phoneNumber = phoneController.text;
+                  launchWhatsAppUri(
+                      phoneNumber); // Launch WhatsApp with the entered phone number
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Please enter a valid phone number')),
+                  );
+                }
+                phoneController.clear();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,6 +134,12 @@ class _ResultPageState extends State<ResultPage> {
           MessageBubble(
             text: _message,
           ),
+          Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                    const Text('Share on: ',style: TextStyle(color: Colors.white),),
+                    IconButton(onPressed: showPhoneNumberDialog, icon: const FaIcon(FontAwesomeIcons.whatsapp, color: CyberpunkColors.fluorescentCyan,))
+                  ]),
         ],
       ),
     );

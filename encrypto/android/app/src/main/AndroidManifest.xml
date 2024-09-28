@@ -10,7 +10,7 @@ xmlns:tools="http://schemas.android.com/tools">
 
     <application
         android:requestLegacyExternalStorage="true"
-        android:label="app"
+        android:label="Encrypto"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

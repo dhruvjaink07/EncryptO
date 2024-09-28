@@ -45,11 +45,12 @@ class _SignInState extends State<SignIn> {
         // Parse the response body to extract username
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         final String username = responseData['user']['username'];
-
+        final String id = responseData['user']['id'];
         // Store email and username in SharedPreferences
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('email', email);
         await prefs.setString('username', username);
+        await prefs.setString('id',id);
 
         print("Data Stored: email = $email, username = $username");
         return 200;

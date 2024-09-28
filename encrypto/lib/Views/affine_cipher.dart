@@ -7,6 +7,9 @@ import 'package:app/utils/constants.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:whatsapp_unilink/whatsapp_unilink.dart';
 
 
 class AffineCipherScreen extends StatefulWidget {
@@ -20,6 +23,7 @@ class _AffineCipherScreenState extends State<AffineCipherScreen> {
   final messageController = TextEditingController();
   final keyOneController = TextEditingController();
   final keyTwoController = TextEditingController();
+  final phoneController = TextEditingController();
   String recipientEmail = '';
   String resultText = '';
 
@@ -221,6 +225,79 @@ void showEmailBottomSheet() {
     },
   );
 }
+// Add these methods to your _CaesarCipherScreenState class
+
+  launchWhatsAppUri(String phoneNumber) async {
+    final link = WhatsAppUnilink(
+      phoneNumber: phoneNumber,
+      text: "Message $resultText : To Decrypt : Keys are - ${keyOneController.text} and ${keyTwoController.text} as of Affine Cipher",
+    );
+    // Correctly convert to Uri using toString()
+    final uri = Uri.parse(link.toString());
+
+    try {
+      await launchUrl(uri);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to launch WhatsApp')),
+      );
+    }
+  }
+
+  void showPhoneNumberDialog() {
+    String phoneNumber = '';
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: CyberpunkColors.oxfordBlue,
+          title: const Text(
+            'Enter Phone Number',
+            style: TextStyle(color: CyberpunkColors.fluorescentCyan),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16.0, vertical: 8.0), // Reduced padding
+
+          content: TextInputField(
+              publicKeyController: phoneController,
+              labelText: 'Phone Number (with country code)'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: CyberpunkColors.darkViolet),
+              ),
+              onPressed: () {
+                phoneController.clear();
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text(
+                'Send',
+                style: TextStyle(color: CyberpunkColors.darkViolet),
+              ),
+              onPressed: () {
+                if (phoneController.text.isNotEmpty) {
+                  Navigator.of(context).pop(); // Close the dialog
+                  phoneNumber = phoneController.text;
+                  launchWhatsAppUri(
+                      phoneNumber); // Launch WhatsApp with the entered phone number
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Please enter a valid phone number')),
+                  );
+                }
+                phoneController.clear();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -243,20 +320,21 @@ void showEmailBottomSheet() {
           ),
         ),
         actions: [
-    Tooltip(
-      message: 'Applies a mathematical formula to encrypt text using modular arithmetic.', // The message to display when hovering or long-pressing
-      preferBelow: true,
-      waitDuration: const Duration(milliseconds: 1000),
-      child: IconButton(
-        onPressed: () {
-          // You can add any action here if needed
-        },
-        icon: const Icon(
-          Icons.info,
-          color: CyberpunkColors.fluorescentCyan, // Icon color
-        ),
-      ),
-    ),
+              IconButton(
+            onPressed: () {
+              setState(() {
+                messageController.clear();
+                keyOneController.clear();
+                keyTwoController.clear();
+                phoneController.clear();
+                resultText = '';
+              });
+            },
+            icon: const Icon(
+              Icons.refresh_outlined,
+              color: CyberpunkColors.fluorescentCyan,
+            ),
+          ),
   ],
       ),
       body: SafeArea(
@@ -323,25 +401,34 @@ void showEmailBottomSheet() {
                       ),
                     ],
                   ),
-                  ElevatedButton(
-                    onPressed: showEmailBottomSheet,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: CyberpunkColors.hollywoodCerise,
-                    ),
-                    child: const Text(
-                      'Share via Email',
-                      style: TextStyle(color: CyberpunkColors.fluorescentCyan),
-                    ),
-                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                    const Text('Share on: ',style: TextStyle(color: Colors.white),),
+                    IconButton(
+                        icon: const Icon(Icons.mail_outline_outlined, color: CyberpunkColors.fluorescentCyan,),
+                        onPressed: showEmailBottomSheet),
+                    IconButton(onPressed: showPhoneNumberDialog, icon: const FaIcon(FontAwesomeIcons.whatsapp, color: CyberpunkColors.fluorescentCyan,))
+                  ]),
                   ElevatedButton(
                     onPressed: pickAndEncryptFile,
-                    child: const Text('Encrypt Text File'),
-                  ),
+                    style: ElevatedButton.styleFrom(
+                  backgroundColor: CyberpunkColors.hollywoodCerise,
+                ),
+                child: const Text(
+                  'Encrypt File',
+                  style: TextStyle(color: CyberpunkColors.fluorescentCyan),
+                ),),
                   const SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: pickAndDecryptFile,
-                    child: const Text('Decrypt Text File'),
-                  ),
+                    style: ElevatedButton.styleFrom(
+                  backgroundColor: CyberpunkColors.hollywoodCerise,
+                ),
+                child: const Text(
+                  'Decrypt File',
+                  style: TextStyle(color: CyberpunkColors.fluorescentCyan),
+                ),),
                 ],
               ),
             ),
