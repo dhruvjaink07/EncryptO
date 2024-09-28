@@ -87,7 +87,7 @@ class _GlitchTextState extends State<GlitchText> with SingleTickerProviderStateM
                 opacity: _random.nextBool() ? 0.8 : 0.2,
                 child: Text(
                   widget.text,
-                  style: widget.style.copyWith(color: CyberpunkColors.hollywoodCerise.withOpacity(0.6)),
+                  style: widget.style.copyWith(color: CyberpunkColors.fluorescentCyan.withOpacity(0.6)),
                 ),
               ),
             ),

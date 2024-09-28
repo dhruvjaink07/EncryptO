@@ -29,6 +29,14 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
+  // Clear SharedPreferences on logout
+  Future<void> _logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear(); // Clear all stored data
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => const SignIn()));
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -40,10 +48,7 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundColor: CyberpunkColors.oxfordBlue,
         actions: [
           IconButton(
-              onPressed: () {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => const SignIn()));
-              },
+              onPressed: _logout, // Call the logout function
               icon: const Icon(
                 Icons.logout,
                 color: Colors.red,
@@ -57,13 +62,8 @@ class _ProfilePageState extends State<ProfilePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Container(
-              height: 100,
-              width: 200,
-              decoration: const BoxDecoration(
-                color: CyberpunkColors.fluorescentCyan,
-                shape: BoxShape.circle,
-              ),
+            const CircleAvatar(
+              child: Icon(Icons.person),
             ),
             const SizedBox(height: 10),
             // Display the retrieved username
@@ -83,7 +83,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   fontSize: 18,
                   fontWeight: FontWeight.w600),
             ),
-            
           ],
         ),
       ),
