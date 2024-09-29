@@ -5,8 +5,16 @@ import 'package:app/Views/md5_hash_screen.dart';
 import 'package:app/Views/sign-in-up/sign_up.dart';
 import 'package:app/Views/splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Import this
+
 void main() {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized(); // Ensures that binding is initialized before setting orientation
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp, // Lock in portrait mode
+    DeviceOrientation.portraitDown, // Optional: allow upside-down portrait
+  ]).then((_) {
+    runApp(const MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -21,7 +29,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: SplashScreen()
-      );
+      home: SplashScreen(),
+    );
   }
 }
