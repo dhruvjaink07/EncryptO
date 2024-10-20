@@ -1,50 +1,58 @@
-
 name: Flutter CI
 
-# This workflow is triggered on pushes to the repository.
-
+# Trigger the workflow on pushes to the master branch
 on:
   push:
     branches:
-    - master
-    
-# on: push    # Default will running for every branch.
-    
+      - master
+
 jobs:
   build:
-    # This job will run on ubuntu virtual machine
+    # Use the latest Ubuntu environment for the build
     runs-on: ubuntu-latest
+
     steps:
-    
-    # Setup Java environment in order to build the Android app.
-    - uses: actions/checkout@v1
-    - uses: actions/setup-java@v1
+    # Checkout the repository
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    # Setup Java environment for building Android
+    - name: Setup Java 12
+      uses: actions/setup-java@v3
       with:
-        java-version: '12.x'
-    
-    # Setup the flutter environment.
-    - uses: subosito/flutter-action@v1
+        distribution: 'temurin' # Use the Temurin distribution for Java
+        java-version: '12'
+
+    # Setup Flutter environment
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
       with:
-        channel: 'beta' # 'dev', 'alpha', default to: 'stable'
-        # flutter-version: '1.12.x' # you can also specify exact version of flutter
-    
-    # Get flutter dependencies.
-    - run: flutter pub get
-    
-    # Check for any formatting issues in the code.
-    - run: flutter format --set-exit-if-changed .
-    
-    # Statically analyze the Dart code for any errors.
-    - run: flutter analyze .
-    
-    # Run widget tests for our flutter project.
-    - run: flutter test
-    
-    # Build apk.
-    - run: flutter build apk
-    
-    # Upload generated apk to the artifacts.
-    - uses: actions/upload-artifact@v1
+        flutter-version: '3.10.0' # You can specify the version you need
+        channel: 'stable' # Set to stable for production builds
+
+    # Fetch Flutter dependencies
+    - name: Install Dependencies
+      run: flutter pub get
+
+    # Verify code formatting
+    - name: Verify Code Formatting
+      run: flutter format --set-exit-if-changed .
+
+    # Analyze the code for potential issues
+    - name: Analyze Code
+      run: flutter analyze
+
+    # Run widget tests
+    - name: Run Tests
+      run: flutter test
+
+    # Build APK in release mode
+    - name: Build APK
+      run: flutter build apk --release
+
+    # Upload the generated APK to GitHub artifacts
+    - name: Upload APK
+      uses: actions/upload-artifact@v3
       with:
         name: release-apk
-        path: build/app/outputs/apk/release/app-release.apk
+        path: build/app/outputs/flutter-apk/app-release.apk
